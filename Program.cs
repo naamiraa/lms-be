@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using be.Services.Auth;
 using be.Services.TrainingDomain;
 using be.Services.LearningModule;
+using be.Services.LearningContent;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -26,7 +27,11 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ILearningModuleService,
     LearningModuleService>();
-    
+
+builder.Services.AddScoped<
+    ILearningContentService,
+    LearningContentService>();
+
 builder.Services.AddControllers();
 
 builder.Services

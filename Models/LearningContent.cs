@@ -5,7 +5,6 @@ public class LearningContent
     public Guid Id { get; set; } = Guid.NewGuid();
 
     public Guid LearningModuleId { get; set; }
-
     public LearningModule LearningModule { get; set; } = null!;
 
     public string Title { get; set; } = string.Empty;
