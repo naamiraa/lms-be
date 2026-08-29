@@ -1,0 +1,21 @@
+# .NET build
+bin/
+obj/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# User-specific files
+*.user
+*.suo
+
+# Environment / secrets
+.env
+.env.*
+appsettings.Local.json
+
+# OS
+.DS_Store
+Thumbs.db
