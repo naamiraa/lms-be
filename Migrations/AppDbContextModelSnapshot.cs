@@ -22,6 +22,120 @@ namespace be.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("be.Models.LearningContent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LearningModuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningModuleId");
+
+                    b.ToTable("LearningContents");
+                });
+
+            modelBuilder.Entity("be.Models.LearningModule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TrainingDomainId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingDomainId");
+
+                    b.ToTable("LearningModules");
+                });
+
+            modelBuilder.Entity("be.Models.LearningProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LearningContentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningContentId");
+
+                    b.HasIndex("UserId", "LearningContentId")
+                        .IsUnique();
+
+                    b.ToTable("LearningProgresses");
+                });
+
             modelBuilder.Entity("be.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -54,6 +168,33 @@ namespace be.Migrations
                             Id = 3,
                             Name = "PARTICIPANT"
                         });
+                });
+
+            modelBuilder.Entity("be.Models.TrainingDomain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrainingDomains");
                 });
 
             modelBuilder.Entity("be.Models.User", b =>
@@ -113,6 +254,47 @@ namespace be.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("be.Models.LearningContent", b =>
+                {
+                    b.HasOne("be.Models.LearningModule", "LearningModule")
+                        .WithMany("Contents")
+                        .HasForeignKey("LearningModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LearningModule");
+                });
+
+            modelBuilder.Entity("be.Models.LearningModule", b =>
+                {
+                    b.HasOne("be.Models.TrainingDomain", "TrainingDomain")
+                        .WithMany("LearningModules")
+                        .HasForeignKey("TrainingDomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainingDomain");
+                });
+
+            modelBuilder.Entity("be.Models.LearningProgress", b =>
+                {
+                    b.HasOne("be.Models.LearningContent", "LearningContent")
+                        .WithMany()
+                        .HasForeignKey("LearningContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LearningContent");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("be.Models.UserRole", b =>
                 {
                     b.HasOne("be.Models.Role", "Role")
@@ -132,9 +314,19 @@ namespace be.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("be.Models.LearningModule", b =>
+                {
+                    b.Navigation("Contents");
+                });
+
             modelBuilder.Entity("be.Models.Role", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("be.Models.TrainingDomain", b =>
+                {
+                    b.Navigation("LearningModules");
                 });
 
             modelBuilder.Entity("be.Models.User", b =>

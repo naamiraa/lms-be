@@ -13,6 +13,11 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
+   
+    public DbSet<TrainingDomain> TrainingDomains => Set<TrainingDomain>();
+    public DbSet<LearningModule> LearningModules => Set<LearningModule>();
+    public DbSet<LearningContent> LearningContents => Set<LearningContent>();
+    public DbSet<LearningProgress> LearningProgresses => Set<LearningProgress>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,5 +41,33 @@ public class AppDbContext : DbContext
             new Role { Id = 2, Name = "INSTRUCTOR" },
             new Role { Id = 3, Name = "PARTICIPANT" }
         );
+
+        modelBuilder.Entity<LearningModule>()
+            .HasOne(m => m.TrainingDomain)
+            .WithMany(d => d.LearningModules)
+            .HasForeignKey(m => m.TrainingDomainId);
+
+        modelBuilder.Entity<LearningContent>()
+            .HasOne(c => c.LearningModule)
+            .WithMany(m => m.Contents)
+            .HasForeignKey(c => c.LearningModuleId);
+
+        modelBuilder.Entity<LearningProgress>()
+            .HasOne(p => p.User)
+            .WithMany()
+            .HasForeignKey(p => p.UserId);
+
+        modelBuilder.Entity<LearningProgress>()
+            .HasOne(p => p.LearningContent)
+            .WithMany()
+            .HasForeignKey(p => p.LearningContentId);
+
+        modelBuilder.Entity<LearningProgress>()
+            .HasIndex(p => new
+            {
+                p.UserId,
+                p.LearningContentId
+            })
+            .IsUnique();
     }
 }
