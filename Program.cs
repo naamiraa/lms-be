@@ -7,6 +7,7 @@ using be.Services.LearningContent;
 using be.Services.LearningProgress;
 using be.Services.Assessment;
 using be.Services.AssessmentQuestion;
+using be.Services.ParticipantAssessment;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -46,6 +47,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAssessmentQuestionService,
     AssessmentQuestionService>();
+
+builder.Services.AddScoped<
+    IParticipantAssessmentService,
+    ParticipantAssessmentService>();
 
 builder.Services.AddControllers();
 
