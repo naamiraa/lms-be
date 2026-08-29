@@ -2,6 +2,7 @@ using be.Data;
 using Microsoft.EntityFrameworkCore;
 using be.Services.Auth;
 using be.Services.TrainingDomain;
+using be.Services.LearningModule;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -18,7 +19,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<ITrainingDomainService, TrainingDomainService>();
+builder.Services.AddScoped<
+    ITrainingDomainService,
+    TrainingDomainService>();
+    
+builder.Services.AddScoped<
+    ILearningModuleService,
+    LearningModuleService>();
+    
 builder.Services.AddControllers();
 
 builder.Services
