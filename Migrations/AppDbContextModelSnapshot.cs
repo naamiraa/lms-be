@@ -362,6 +362,192 @@ namespace be.Migrations
                         });
                 });
 
+            modelBuilder.Entity("be.Models.SimulationDomain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SimulationDomains");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double?>("OccurredAtSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("PenaltyPoints")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Severity")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SimulationSessionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SimulationSessionId");
+
+                    b.ToTable("SimulationEvents");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("CompletionTimeSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("EmergencyResponseScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("OverallSimulatorScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("SafetyScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("SimulationSessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TotalViolations")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("VehicleControlScore")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SimulationSessionId")
+                        .IsUnique();
+
+                    b.ToTable("SimulationResults");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationScenario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Difficulty")
+                        .HasColumnType("text");
+
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SimulationDomainId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SimulationDomainId");
+
+                    b.ToTable("SimulationScenarios");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentAttemptId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SimulationScenarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessmentAttemptId");
+
+                    b.HasIndex("SimulationScenarioId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SimulationSessions");
+                });
+
             modelBuilder.Entity("be.Models.TrainingDomain", b =>
                 {
                     b.Property<Guid>("Id")
@@ -566,6 +752,66 @@ namespace be.Migrations
                     b.Navigation("AssessmentQuestion");
                 });
 
+            modelBuilder.Entity("be.Models.SimulationEvent", b =>
+                {
+                    b.HasOne("be.Models.SimulationSession", "SimulationSession")
+                        .WithMany("Events")
+                        .HasForeignKey("SimulationSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SimulationSession");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationResult", b =>
+                {
+                    b.HasOne("be.Models.SimulationSession", "SimulationSession")
+                        .WithOne("Result")
+                        .HasForeignKey("be.Models.SimulationResult", "SimulationSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SimulationSession");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationScenario", b =>
+                {
+                    b.HasOne("be.Models.SimulationDomain", "SimulationDomain")
+                        .WithMany("Scenarios")
+                        .HasForeignKey("SimulationDomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SimulationDomain");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationSession", b =>
+                {
+                    b.HasOne("be.Models.AssessmentAttempt", "AssessmentAttempt")
+                        .WithMany("SimulationSessions")
+                        .HasForeignKey("AssessmentAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.SimulationScenario", "SimulationScenario")
+                        .WithMany("Sessions")
+                        .HasForeignKey("SimulationScenarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentAttempt");
+
+                    b.Navigation("SimulationScenario");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("be.Models.UserRole", b =>
                 {
                     b.HasOne("be.Models.Role", "Role")
@@ -595,6 +841,8 @@ namespace be.Migrations
             modelBuilder.Entity("be.Models.AssessmentAttempt", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("SimulationSessions");
                 });
 
             modelBuilder.Entity("be.Models.AssessmentQuestion", b =>
@@ -612,6 +860,23 @@ namespace be.Migrations
             modelBuilder.Entity("be.Models.Role", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationDomain", b =>
+                {
+                    b.Navigation("Scenarios");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationScenario", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("be.Models.SimulationSession", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Result");
                 });
 
             modelBuilder.Entity("be.Models.TrainingDomain", b =>

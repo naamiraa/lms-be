@@ -33,6 +33,21 @@ public class AppDbContext : DbContext
     public DbSet<AssessmentAnswer> AssessmentAnswers
         => Set<AssessmentAnswer>();
 
+    public DbSet<SimulationDomain> SimulationDomains
+    => Set<SimulationDomain>();
+
+    public DbSet<SimulationScenario> SimulationScenarios
+        => Set<SimulationScenario>();
+
+    public DbSet<SimulationSession> SimulationSessions
+        => Set<SimulationSession>();
+
+    public DbSet<SimulationResult> SimulationResults
+        => Set<SimulationResult>();
+
+    public DbSet<SimulationEvent> SimulationEvents
+        => Set<SimulationEvent>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -141,5 +156,41 @@ public class AppDbContext : DbContext
                 a.AssessmentQuestionId
             })
             .IsUnique();
+
+
+        modelBuilder.Entity<SimulationScenario>()
+            .HasOne(s => s.SimulationDomain)
+            .WithMany(d => d.Scenarios)
+            .HasForeignKey(s => s.SimulationDomainId);
+
+        modelBuilder.Entity<SimulationSession>()
+            .HasOne(s => s.User)
+            .WithMany()
+            .HasForeignKey(s => s.UserId);
+
+        modelBuilder.Entity<SimulationSession>()
+            .HasOne(s => s.SimulationScenario)
+            .WithMany(s => s.Sessions)
+            .HasForeignKey(s => s.SimulationScenarioId);
+
+        modelBuilder.Entity<SimulationSession>()
+            .HasOne(s => s.AssessmentAttempt)
+            .WithMany(a => a.SimulationSessions)
+            .HasForeignKey(s => s.AssessmentAttemptId);
+
+        modelBuilder.Entity<SimulationResult>()
+            .HasOne(r => r.SimulationSession)
+            .WithOne(s => s.Result)
+            .HasForeignKey<SimulationResult>(
+                r => r.SimulationSessionId);
+
+        modelBuilder.Entity<SimulationResult>()
+            .HasIndex(r => r.SimulationSessionId)
+            .IsUnique();
+
+        modelBuilder.Entity<SimulationEvent>()
+            .HasOne(e => e.SimulationSession)
+            .WithMany(s => s.Events)
+            .HasForeignKey(e => e.SimulationSessionId);
     }
 }

@@ -26,4 +26,7 @@ public class AssessmentAttempt
 
     public ICollection<AssessmentAnswer> Answers { get; set; }
         = new List<AssessmentAnswer>();
+
+    public ICollection<SimulationSession> SimulationSessions { get; set; }
+    = new List<SimulationSession>();
 }
