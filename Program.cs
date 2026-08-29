@@ -48,6 +48,24 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+    var passwordHasher = scope.ServiceProvider
+        .GetRequiredService<IPasswordHasher<User>>();
+
+    var configuration = scope.ServiceProvider
+        .GetRequiredService<IConfiguration>();
+
+    await DbSeeder.SeedAsync(
+        dbContext,
+        passwordHasher,
+        configuration
+    );
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
