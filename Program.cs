@@ -5,6 +5,8 @@ using be.Services.TrainingDomain;
 using be.Services.LearningModule;
 using be.Services.LearningContent;
 using be.Services.LearningProgress;
+using be.Services.Assessment;
+using be.Services.AssessmentQuestion;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -36,6 +38,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ILearningProgressService,
     LearningProgressService>();
+
+builder.Services.AddScoped<
+    IAssessmentService,
+    AssessmentService>();
+
+builder.Services.AddScoped<
+    IAssessmentQuestionService,
+    AssessmentQuestionService>();
 
 builder.Services.AddControllers();
 

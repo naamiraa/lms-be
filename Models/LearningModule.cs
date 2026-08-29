@@ -22,4 +22,7 @@ public class LearningModule
 
     public ICollection<LearningContent> Contents { get; set; }
         = new List<LearningContent>();
+
+    public ICollection<Assessment> Assessments { get; set; }
+    = new List<Assessment>();
 }

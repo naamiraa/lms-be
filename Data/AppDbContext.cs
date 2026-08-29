@@ -19,6 +19,20 @@ public class AppDbContext : DbContext
     public DbSet<LearningContent> LearningContents => Set<LearningContent>();
     public DbSet<LearningProgress> LearningProgresses => Set<LearningProgress>();
 
+    public DbSet<Assessment> Assessments => Set<Assessment>();
+
+    public DbSet<AssessmentQuestion> AssessmentQuestions
+        => Set<AssessmentQuestion>();
+
+    public DbSet<QuestionOption> QuestionOptions
+        => Set<QuestionOption>();
+
+    public DbSet<AssessmentAttempt> AssessmentAttempts
+        => Set<AssessmentAttempt>();
+
+    public DbSet<AssessmentAnswer> AssessmentAnswers
+        => Set<AssessmentAnswer>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -67,6 +81,64 @@ public class AppDbContext : DbContext
             {
                 p.UserId,
                 p.LearningContentId
+            })
+            .IsUnique();
+
+        modelBuilder.Entity<Assessment>()
+            .HasOne(a => a.LearningModule)
+            .WithMany(m => m.Assessments)
+            .HasForeignKey(a => a.LearningModuleId);
+
+        modelBuilder.Entity<AssessmentQuestion>()
+            .HasOne(q => q.Assessment)
+            .WithMany(a => a.Questions)
+            .HasForeignKey(q => q.AssessmentId);
+
+        modelBuilder.Entity<QuestionOption>()
+            .HasOne(o => o.AssessmentQuestion)
+            .WithMany(q => q.Options)
+            .HasForeignKey(o => o.AssessmentQuestionId);
+
+        modelBuilder.Entity<AssessmentAttempt>()
+            .HasOne(a => a.Assessment)
+            .WithMany(a => a.Attempts)
+            .HasForeignKey(a => a.AssessmentId);
+
+        modelBuilder.Entity<AssessmentAttempt>()
+            .HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => a.UserId);
+
+        modelBuilder.Entity<AssessmentAttempt>()
+            .HasIndex(a => new
+            {
+                a.AssessmentId,
+                a.UserId,
+                a.AttemptNumber
+            })
+            .IsUnique();
+
+        modelBuilder.Entity<AssessmentAnswer>()
+            .HasOne(a => a.AssessmentAttempt)
+            .WithMany(a => a.Answers)
+            .HasForeignKey(a => a.AssessmentAttemptId);
+
+        modelBuilder.Entity<AssessmentAnswer>()
+            .HasOne(a => a.AssessmentQuestion)
+            .WithMany()
+            .HasForeignKey(a => a.AssessmentQuestionId);
+
+        modelBuilder.Entity<AssessmentAnswer>()
+            .HasOne(a => a.SelectedOption)
+            .WithMany()
+            .HasForeignKey(a => a.SelectedOptionId);
+
+
+        modelBuilder.Entity<AssessmentAnswer>()
+            .HasIndex(a => new
+            {
+                a.AssessmentAttemptId,
+                a.AssessmentQuestionId
             })
             .IsUnique();
     }

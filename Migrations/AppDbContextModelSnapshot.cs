@@ -22,6 +22,163 @@ namespace be.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("be.Models.Assessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LearningModuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("PassingScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningModuleId");
+
+                    b.ToTable("Assessments");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentAttemptId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentQuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SelectedOptionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessmentQuestionId");
+
+                    b.HasIndex("SelectedOptionId");
+
+                    b.HasIndex("AssessmentAttemptId", "AssessmentQuestionId")
+                        .IsUnique();
+
+                    b.ToTable("AssessmentAnswers");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AttemptNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("Score")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("AssessmentId", "UserId", "AttemptNumber")
+                        .IsUnique();
+
+                    b.ToTable("AssessmentAttempts");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentQuestion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MediaUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessmentId");
+
+                    b.ToTable("AssessmentQuestions");
+                });
+
             modelBuilder.Entity("be.Models.LearningContent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -134,6 +291,41 @@ namespace be.Migrations
                         .IsUnique();
 
                     b.ToTable("LearningProgresses");
+                });
+
+            modelBuilder.Entity("be.Models.QuestionOption", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssessmentQuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("OptionText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessmentQuestionId");
+
+                    b.ToTable("QuestionOptions");
                 });
 
             modelBuilder.Entity("be.Models.Role", b =>
@@ -254,6 +446,74 @@ namespace be.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("be.Models.Assessment", b =>
+                {
+                    b.HasOne("be.Models.LearningModule", "LearningModule")
+                        .WithMany("Assessments")
+                        .HasForeignKey("LearningModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LearningModule");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentAnswer", b =>
+                {
+                    b.HasOne("be.Models.AssessmentAttempt", "AssessmentAttempt")
+                        .WithMany("Answers")
+                        .HasForeignKey("AssessmentAttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.AssessmentQuestion", "AssessmentQuestion")
+                        .WithMany()
+                        .HasForeignKey("AssessmentQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.QuestionOption", "SelectedOption")
+                        .WithMany()
+                        .HasForeignKey("SelectedOptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentAttempt");
+
+                    b.Navigation("AssessmentQuestion");
+
+                    b.Navigation("SelectedOption");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentAttempt", b =>
+                {
+                    b.HasOne("be.Models.Assessment", "Assessment")
+                        .WithMany("Attempts")
+                        .HasForeignKey("AssessmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assessment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentQuestion", b =>
+                {
+                    b.HasOne("be.Models.Assessment", "Assessment")
+                        .WithMany("Questions")
+                        .HasForeignKey("AssessmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assessment");
+                });
+
             modelBuilder.Entity("be.Models.LearningContent", b =>
                 {
                     b.HasOne("be.Models.LearningModule", "LearningModule")
@@ -295,6 +555,17 @@ namespace be.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("be.Models.QuestionOption", b =>
+                {
+                    b.HasOne("be.Models.AssessmentQuestion", "AssessmentQuestion")
+                        .WithMany("Options")
+                        .HasForeignKey("AssessmentQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssessmentQuestion");
+                });
+
             modelBuilder.Entity("be.Models.UserRole", b =>
                 {
                     b.HasOne("be.Models.Role", "Role")
@@ -314,8 +585,27 @@ namespace be.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("be.Models.Assessment", b =>
+                {
+                    b.Navigation("Attempts");
+
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentAttempt", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
+            modelBuilder.Entity("be.Models.AssessmentQuestion", b =>
+                {
+                    b.Navigation("Options");
+                });
+
             modelBuilder.Entity("be.Models.LearningModule", b =>
                 {
+                    b.Navigation("Assessments");
+
                     b.Navigation("Contents");
                 });
 
