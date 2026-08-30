@@ -48,6 +48,24 @@ public class AppDbContext : DbContext
     public DbSet<SimulationEvent> SimulationEvents
         => Set<SimulationEvent>();
 
+    public DbSet<InstructorFeedback> InstructorFeedbacks
+        => Set<InstructorFeedback>();
+
+    public DbSet<FeedbackStrength> FeedbackStrengths
+        => Set<FeedbackStrength>();
+
+    public DbSet<FeedbackImprovementArea> FeedbackImprovementAreas
+        => Set<FeedbackImprovementArea>();
+
+    public DbSet<SafetyRecommendation> SafetyRecommendations
+        => Set<SafetyRecommendation>();
+
+    public DbSet<ViolationExplanation> ViolationExplanations
+        => Set<ViolationExplanation>();
+
+    public DbSet<FeedbackRecommendedModule> FeedbackRecommendedModules
+        => Set<FeedbackRecommendedModule>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -192,5 +210,59 @@ public class AppDbContext : DbContext
             .HasOne(e => e.SimulationSession)
             .WithMany(s => s.Events)
             .HasForeignKey(e => e.SimulationSessionId);
+
+
+        modelBuilder.Entity<InstructorFeedback>()
+            .HasOne(f => f.SimulationSession)
+            .WithOne(s => s.InstructorFeedback)
+            .HasForeignKey<InstructorFeedback>(
+                f => f.SimulationSessionId);
+
+        modelBuilder.Entity<InstructorFeedback>()
+            .HasIndex(f => f.SimulationSessionId)
+            .IsUnique();
+
+        modelBuilder.Entity<InstructorFeedback>()
+            .HasOne(f => f.Instructor)
+            .WithMany()
+            .HasForeignKey(f => f.InstructorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<FeedbackStrength>()
+            .HasOne(s => s.InstructorFeedback)
+            .WithMany(f => f.Strengths)
+            .HasForeignKey(s => s.InstructorFeedbackId);
+
+        modelBuilder.Entity<FeedbackImprovementArea>()
+            .HasOne(a => a.InstructorFeedback)
+            .WithMany(f => f.ImprovementAreas)
+            .HasForeignKey(a => a.InstructorFeedbackId);
+
+        modelBuilder.Entity<SafetyRecommendation>()
+            .HasOne(r => r.InstructorFeedback)
+            .WithMany(f => f.SafetyRecommendations)
+            .HasForeignKey(r => r.InstructorFeedbackId);
+
+        modelBuilder.Entity<ViolationExplanation>()
+            .HasOne(v => v.InstructorFeedback)
+            .WithMany(f => f.ViolationExplanations)
+            .HasForeignKey(v => v.InstructorFeedbackId);
+
+        modelBuilder.Entity<ViolationExplanation>()
+            .HasOne(v => v.SimulationEvent)
+            .WithMany()
+            .HasForeignKey(v => v.SimulationEventId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<FeedbackRecommendedModule>()
+            .HasOne(r => r.InstructorFeedback)
+            .WithMany(f => f.RecommendedModules)
+            .HasForeignKey(r => r.InstructorFeedbackId);
+
+        modelBuilder.Entity<FeedbackRecommendedModule>()
+            .HasOne(r => r.LearningModule)
+            .WithMany()
+            .HasForeignKey(r => r.LearningModuleId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -179,6 +179,123 @@ namespace be.Migrations
                     b.ToTable("AssessmentQuestions");
                 });
 
+            modelBuilder.Entity("be.Models.FeedbackImprovementArea", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("InstructorFeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorFeedbackId");
+
+                    b.ToTable("FeedbackImprovementAreas");
+                });
+
+            modelBuilder.Entity("be.Models.FeedbackRecommendedModule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("InstructorFeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LearningModuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RecommendationType")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorFeedbackId");
+
+                    b.HasIndex("LearningModuleId");
+
+                    b.ToTable("FeedbackRecommendedModules");
+                });
+
+            modelBuilder.Entity("be.Models.FeedbackStrength", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("InstructorFeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorFeedbackId");
+
+                    b.ToTable("FeedbackStrengths");
+                });
+
+            modelBuilder.Entity("be.Models.InstructorFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EvaluatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("InstructorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("OverallComments")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SimulationSessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorId");
+
+                    b.HasIndex("SimulationSessionId")
+                        .IsUnique();
+
+                    b.ToTable("InstructorFeedbacks");
+                });
+
             modelBuilder.Entity("be.Models.LearningContent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -360,6 +477,32 @@ namespace be.Migrations
                             Id = 3,
                             Name = "PARTICIPANT"
                         });
+                });
+
+            modelBuilder.Entity("be.Models.SafetyRecommendation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("InstructorFeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorFeedbackId");
+
+                    b.ToTable("SafetyRecommendations");
                 });
 
             modelBuilder.Entity("be.Models.SimulationDomain", b =>
@@ -632,6 +775,34 @@ namespace be.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("be.Models.ViolationExplanation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Explanation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("InstructorFeedbackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SimulationEventId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorFeedbackId");
+
+                    b.HasIndex("SimulationEventId");
+
+                    b.ToTable("ViolationExplanations");
+                });
+
             modelBuilder.Entity("be.Models.Assessment", b =>
                 {
                     b.HasOne("be.Models.LearningModule", "LearningModule")
@@ -700,6 +871,66 @@ namespace be.Migrations
                     b.Navigation("Assessment");
                 });
 
+            modelBuilder.Entity("be.Models.FeedbackImprovementArea", b =>
+                {
+                    b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
+                        .WithMany("ImprovementAreas")
+                        .HasForeignKey("InstructorFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InstructorFeedback");
+                });
+
+            modelBuilder.Entity("be.Models.FeedbackRecommendedModule", b =>
+                {
+                    b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
+                        .WithMany("RecommendedModules")
+                        .HasForeignKey("InstructorFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.LearningModule", "LearningModule")
+                        .WithMany()
+                        .HasForeignKey("LearningModuleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InstructorFeedback");
+
+                    b.Navigation("LearningModule");
+                });
+
+            modelBuilder.Entity("be.Models.FeedbackStrength", b =>
+                {
+                    b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
+                        .WithMany("Strengths")
+                        .HasForeignKey("InstructorFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InstructorFeedback");
+                });
+
+            modelBuilder.Entity("be.Models.InstructorFeedback", b =>
+                {
+                    b.HasOne("be.Models.User", "Instructor")
+                        .WithMany()
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.SimulationSession", "SimulationSession")
+                        .WithOne("InstructorFeedback")
+                        .HasForeignKey("be.Models.InstructorFeedback", "SimulationSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Instructor");
+
+                    b.Navigation("SimulationSession");
+                });
+
             modelBuilder.Entity("be.Models.LearningContent", b =>
                 {
                     b.HasOne("be.Models.LearningModule", "LearningModule")
@@ -750,6 +981,17 @@ namespace be.Migrations
                         .IsRequired();
 
                     b.Navigation("AssessmentQuestion");
+                });
+
+            modelBuilder.Entity("be.Models.SafetyRecommendation", b =>
+                {
+                    b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
+                        .WithMany("SafetyRecommendations")
+                        .HasForeignKey("InstructorFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InstructorFeedback");
                 });
 
             modelBuilder.Entity("be.Models.SimulationEvent", b =>
@@ -831,6 +1073,25 @@ namespace be.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("be.Models.ViolationExplanation", b =>
+                {
+                    b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
+                        .WithMany("ViolationExplanations")
+                        .HasForeignKey("InstructorFeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.SimulationEvent", "SimulationEvent")
+                        .WithMany()
+                        .HasForeignKey("SimulationEventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InstructorFeedback");
+
+                    b.Navigation("SimulationEvent");
+                });
+
             modelBuilder.Entity("be.Models.Assessment", b =>
                 {
                     b.Navigation("Attempts");
@@ -848,6 +1109,19 @@ namespace be.Migrations
             modelBuilder.Entity("be.Models.AssessmentQuestion", b =>
                 {
                     b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("be.Models.InstructorFeedback", b =>
+                {
+                    b.Navigation("ImprovementAreas");
+
+                    b.Navigation("RecommendedModules");
+
+                    b.Navigation("SafetyRecommendations");
+
+                    b.Navigation("Strengths");
+
+                    b.Navigation("ViolationExplanations");
                 });
 
             modelBuilder.Entity("be.Models.LearningModule", b =>
@@ -875,6 +1149,8 @@ namespace be.Migrations
             modelBuilder.Entity("be.Models.SimulationSession", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("InstructorFeedback");
 
                     b.Navigation("Result");
                 });

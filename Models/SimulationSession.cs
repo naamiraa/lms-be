@@ -30,4 +30,6 @@ public class SimulationSession
 
     public ICollection<SimulationEvent> Events { get; set; }
         = new List<SimulationEvent>();
+
+    public InstructorFeedback? InstructorFeedback { get; set; }
 }
