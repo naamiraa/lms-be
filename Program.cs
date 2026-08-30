@@ -10,6 +10,8 @@ using be.Services.AssessmentQuestion;
 using be.Services.ParticipantAssessment;
 using be.Services.SimulationDomain;
 using be.Services.SimulationScenario;
+using be.Services.SimulationSession;
+using be.Services.PerformanceEvaluation;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -61,6 +63,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ISimulationScenarioService,
     SimulationScenarioService>();
+
+builder.Services.AddScoped<
+    ISimulationSessionService,
+    SimulationSessionService>();
+
+builder.Services.AddScoped<
+    IPerformanceEvaluationService,
+    PerformanceEvaluationService>();
 
 builder.Services.AddControllers();
 
