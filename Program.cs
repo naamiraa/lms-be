@@ -8,6 +8,8 @@ using be.Services.LearningProgress;
 using be.Services.Assessment;
 using be.Services.AssessmentQuestion;
 using be.Services.ParticipantAssessment;
+using be.Services.SimulationDomain;
+using be.Services.SimulationScenario;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -51,6 +53,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IParticipantAssessmentService,
     ParticipantAssessmentService>();
+
+builder.Services.AddScoped<
+    ISimulationDomainService,
+    SimulationDomainService>();
+
+builder.Services.AddScoped<
+    ISimulationScenarioService,
+    SimulationScenarioService>();
 
 builder.Services.AddControllers();
 
