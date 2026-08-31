@@ -1,5 +1,6 @@
 using be.Data;
 using be.DTOs.PerformanceEvaluation;
+using be.Services.Evaluation;
 using Microsoft.EntityFrameworkCore;
 
 namespace be.Services.PerformanceEvaluation;
@@ -8,11 +9,14 @@ public class PerformanceEvaluationService
     : IPerformanceEvaluationService
 {
     private readonly AppDbContext _context;
+    private readonly IEvaluationCalculator _evaluationCalculator;
 
     public PerformanceEvaluationService(
-        AppDbContext context)
+        AppDbContext context,
+        IEvaluationCalculator evaluationCalculator)
     {
         _context = context;
+        _evaluationCalculator = evaluationCalculator;
     }
 
     public async Task<PerformanceEvaluationResponse?>
@@ -59,16 +63,13 @@ public class PerformanceEvaluationService
         var simulatorScore =
             session.Result.OverallSimulatorScore;
 
-        // Temporary equal weighting.
-        // We will make this configurable next.
-        var overallScore = Math.Round(
-            (theoryScore + simulatorScore) / 2,
-            2);
+        var overallScore =
+            _evaluationCalculator.CalculateOverallScore(
+                theoryScore,
+                simulatorScore);
 
         var result =
-            overallScore >= 80
-                ? "PASS"
-                : "FAIL";
+            _evaluationCalculator.DetermineResult(overallScore);
 
         return new PerformanceEvaluationResponse
         {

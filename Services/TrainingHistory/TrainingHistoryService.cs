@@ -1,5 +1,6 @@
 using be.Data;
 using be.DTOs.TrainingHistory;
+using be.Services.Evaluation;
 using Microsoft.EntityFrameworkCore;
 
 namespace be.Services.TrainingHistory;
@@ -7,10 +8,14 @@ namespace be.Services.TrainingHistory;
 public class TrainingHistoryService : ITrainingHistoryService
 {
     private readonly AppDbContext _context;
+    private readonly IEvaluationCalculator _evaluationCalculator;
 
-    public TrainingHistoryService(AppDbContext context)
+    public TrainingHistoryService(
+        AppDbContext context,
+        IEvaluationCalculator evaluationCalculator)
     {
         _context = context;
+        _evaluationCalculator = evaluationCalculator;
     }
 
     public async Task<List<TrainingHistoryItemResponse>> GetMyHistoryAsync(
@@ -38,11 +43,10 @@ public class TrainingHistoryService : ITrainingHistoryService
             var theoryScore = s.AssessmentAttempt.Score!.Value;
             var simulatorScore = s.Result!.OverallSimulatorScore;
 
-            // temporary
-            // evaluation rule used by Performance Evaluation later
-            var overallScore = Math.Round(
-                (theoryScore + simulatorScore) / 2,
-                2);
+            var overallScore =
+            _evaluationCalculator.CalculateOverallScore(
+                theoryScore,
+                simulatorScore);
 
             return new TrainingHistoryItemResponse
             {
@@ -72,9 +76,7 @@ public class TrainingHistoryService : ITrainingHistoryService
                 SimulatorScore = simulatorScore,
                 OverallScore = overallScore,
 
-                Result = overallScore >= 80
-                    ? "PASS"
-                    : "FAIL",
+                Result = _evaluationCalculator.DetermineResult(overallScore),
 
                 CompletedAt =
                     s.CompletedAt ?? s.UpdatedAt,
@@ -114,10 +116,10 @@ public class TrainingHistoryService : ITrainingHistoryService
         var theoryScore = session.AssessmentAttempt.Score.Value;
         var simulatorScore = session.Result.OverallSimulatorScore;
 
-        // Temporary evaluation rule.
-        var overallScore = Math.Round(
-            (theoryScore + simulatorScore) / 2,
-            2);
+        var overallScore =
+        _evaluationCalculator.CalculateOverallScore(
+            theoryScore,
+            simulatorScore);
 
         return new TrainingHistoryDetailResponse
         {
@@ -156,9 +158,7 @@ public class TrainingHistoryService : ITrainingHistoryService
                 overallScore,
 
             Result =
-                overallScore >= 80
-                    ? "PASS"
-                    : "FAIL",
+                _evaluationCalculator.DetermineResult(overallScore),
 
             CompletedAt =
                 session.CompletedAt ?? session.UpdatedAt,

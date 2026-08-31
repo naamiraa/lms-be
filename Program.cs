@@ -15,6 +15,8 @@ using be.Services.PerformanceEvaluation;
 using be.Services.InstructorFeedback;
 using be.Services.TrainingHistory;
 using be.Services.Admin;
+using be.Services.Evaluation;
+using be.Settings;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -86,6 +88,13 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ITrainingHistoryService,
     TrainingHistoryService>();
+
+builder.Services.Configure<EvaluationSettings>(
+    builder.Configuration.GetSection("Evaluation"));
+
+builder.Services.AddScoped<
+    IEvaluationCalculator,
+    EvaluationCalculator>();
 
 builder.Services.AddControllers();
 
