@@ -17,6 +17,7 @@ using be.Services.TrainingHistory;
 using be.Services.Admin;
 using be.Services.Evaluation;
 using be.Settings;
+using be.Services.Certificate;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -88,6 +89,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ITrainingHistoryService,
     TrainingHistoryService>();
+
+builder.Services.AddScoped<
+    ICertificateService,
+    CertificateService>();
 
 builder.Services.Configure<EvaluationSettings>(
     builder.Configuration.GetSection("Evaluation"));
