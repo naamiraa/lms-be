@@ -101,6 +101,10 @@ builder.Services.AddScoped<
     IEvaluationCalculator,
     EvaluationCalculator>();
 
+builder.Services.AddScoped<
+    ICertificatePdfService,
+    CertificatePdfService>();
+
 builder.Services.AddControllers();
 
 builder.Services

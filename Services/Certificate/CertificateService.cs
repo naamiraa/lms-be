@@ -237,6 +237,47 @@ public class CertificateService : ICertificateService
         };
     }
 
+
+    public async Task<CertificateResponse?> GetByIdAsync(
+        Guid userId,
+        Guid certificateId)
+    {
+        var certificate = await _context.Certificates
+            .FirstOrDefaultAsync(c =>
+                c.Id == certificateId &&
+                c.UserId == userId);
+
+        if (certificate == null)
+        {
+            return null;
+        }
+
+        var session = await GetSessionAsync(
+            userId,
+            certificate.SimulationSessionId);
+
+        if (session?.Result == null ||
+            session.AssessmentAttempt.Score == null)
+        {
+            return null;
+        }
+
+        var overallScore =
+            _evaluationCalculator.CalculateOverallScore(
+                session.AssessmentAttempt.Score.Value,
+                session.Result.OverallSimulatorScore);
+
+        var result =
+            _evaluationCalculator.DetermineResult(
+                overallScore);
+
+        return await BuildResponseAsync(
+            certificate.Id,
+            overallScore,
+            result);
+    }
+
+
     private static string GenerateCertificateNumber()
     {
         return $"CERT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8].ToUpper()}";

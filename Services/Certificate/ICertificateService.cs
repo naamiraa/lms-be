@@ -14,4 +14,8 @@ public interface ICertificateService
 
     Task<List<CertificateResponse>> GetMyCertificatesAsync(
         Guid userId);
+
+    Task<CertificateResponse?> GetByIdAsync(
+        Guid userId,
+        Guid certificateId);
 }

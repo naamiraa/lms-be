@@ -11,11 +11,14 @@ namespace be.Controllers;
 public class CertificateController : ControllerBase
 {
     private readonly ICertificateService _service;
+    private readonly ICertificatePdfService _pdfService;
 
     public CertificateController(
-        ICertificateService service)
+        ICertificateService service,
+        ICertificatePdfService pdfService)
     {
         _service = service;
+        _pdfService = pdfService;
     }
 
     [HttpPost("session/{sessionId:guid}")]
@@ -91,4 +94,41 @@ public class CertificateController : ControllerBase
 
         return userId;
     }
+
+
+    [HttpGet("{certificateId:guid}/pdf")]
+    public async Task<IActionResult> DownloadPdf(
+        Guid certificateId)
+    {
+        var certificate =
+            await _service.GetByIdAsync(
+                GetCurrentUserId(),
+                certificateId);
+
+        if (certificate == null)
+        {
+            return NotFound(new
+            {
+                message = "Certificate not found."
+            });
+        }
+
+        var pdf =
+            _pdfService.GenerateCertificatePdf(
+                certificate.CertificateNumber,
+                certificate.ParticipantName,
+                certificate.LearningModuleName,
+                certificate.ScenarioName,
+                certificate.OverallScore,
+                certificate.IssuedAt);
+
+        var fileName =
+            $"{certificate.CertificateNumber}.pdf";
+
+        return File(
+            pdf,
+            "application/pdf",
+            fileName);
+    }
+
 }
