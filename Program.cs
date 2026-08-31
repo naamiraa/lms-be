@@ -114,6 +114,10 @@ builder.Services.AddScoped<
     IInstructorDashboardService,
     InstructorDashboardService>();
 
+builder.Services.AddScoped<
+    IAdminDashboardService,
+    AdminDashboardService>();
+
 builder.Services.AddControllers();
 
 builder.Services
