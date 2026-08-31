@@ -13,6 +13,7 @@ using be.Services.SimulationScenario;
 using be.Services.SimulationSession;
 using be.Services.PerformanceEvaluation;
 using be.Services.InstructorFeedback;
+using be.Services.TrainingHistory;
 using be.Services.Admin;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
@@ -81,6 +82,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAdminService, 
     AdminService>();
+
+builder.Services.AddScoped<
+    ITrainingHistoryService,
+    TrainingHistoryService>();
 
 builder.Services.AddControllers();
 
