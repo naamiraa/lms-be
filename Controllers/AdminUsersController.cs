@@ -2,6 +2,8 @@ using be.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using be.DTOs.Admin;
+using be.Services.Admin;
 
 namespace be.Controllers;
 
@@ -11,10 +13,14 @@ namespace be.Controllers;
 public class AdminUsersController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IAdminService _adminService;
 
-    public AdminUsersController(AppDbContext context)
+    public AdminUsersController(
+        AppDbContext context,
+        IAdminService adminService)
     {
         _context = context;
+        _adminService = adminService;
     }
 
     // GET: /api/admin/users/pending
@@ -104,5 +110,29 @@ public class AdminUsersController : ControllerBase
         {
             message = "User rejected successfully."
         });
+    }
+
+
+    [HttpPatch("{id:guid}/role")]
+    public async Task<IActionResult> AssignRole(
+        Guid id,
+        AssignRoleRequest request)
+    {
+        try
+        {
+            await _adminService.AssignRoleAsync(id, request.Role);
+
+            return Ok(new
+            {
+                message = "Role assigned successfully."
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
     }
 }
