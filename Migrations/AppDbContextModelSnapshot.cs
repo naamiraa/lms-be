@@ -179,6 +179,44 @@ namespace be.Migrations
                     b.ToTable("AssessmentQuestions");
                 });
 
+            modelBuilder.Entity("be.Models.Certificate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CertificateNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SimulationSessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateNumber")
+                        .IsUnique();
+
+                    b.HasIndex("SimulationSessionId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Certificates");
+                });
+
             modelBuilder.Entity("be.Models.FeedbackImprovementArea", b =>
                 {
                     b.Property<Guid>("Id")
@@ -871,6 +909,25 @@ namespace be.Migrations
                     b.Navigation("Assessment");
                 });
 
+            modelBuilder.Entity("be.Models.Certificate", b =>
+                {
+                    b.HasOne("be.Models.SimulationSession", "SimulationSession")
+                        .WithOne("Certificate")
+                        .HasForeignKey("be.Models.Certificate", "SimulationSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("be.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SimulationSession");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("be.Models.FeedbackImprovementArea", b =>
                 {
                     b.HasOne("be.Models.InstructorFeedback", "InstructorFeedback")
@@ -1148,6 +1205,8 @@ namespace be.Migrations
 
             modelBuilder.Entity("be.Models.SimulationSession", b =>
                 {
+                    b.Navigation("Certificate");
+
                     b.Navigation("Events");
 
                     b.Navigation("InstructorFeedback");

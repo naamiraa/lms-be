@@ -66,6 +66,9 @@ public class AppDbContext : DbContext
     public DbSet<FeedbackRecommendedModule> FeedbackRecommendedModules
         => Set<FeedbackRecommendedModule>();
 
+    public DbSet<Certificate> Certificates
+        => Set<Certificate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -264,5 +267,27 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.LearningModuleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Certificate>()
+            .HasOne(c => c.User)
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Certificate>()
+            .HasOne(c => c.SimulationSession)
+            .WithOne(s => s.Certificate)
+            .HasForeignKey<Certificate>(
+                c => c.SimulationSessionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Certificate>()
+            .HasIndex(c => c.SimulationSessionId)
+            .IsUnique();
+
+        modelBuilder.Entity<Certificate>()
+            .HasIndex(c => c.CertificateNumber)
+            .IsUnique();
+
     }
 }

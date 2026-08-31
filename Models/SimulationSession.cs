@@ -32,4 +32,6 @@ public class SimulationSession
         = new List<SimulationEvent>();
 
     public InstructorFeedback? InstructorFeedback { get; set; }
+
+    public Certificate? Certificate { get; set; }
 }
