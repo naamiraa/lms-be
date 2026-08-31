@@ -110,6 +110,10 @@ builder.Services.AddScoped<
     IParticipantDashboardService,
     ParticipantDashboardService>();
 
+builder.Services.AddScoped<
+    IInstructorDashboardService,
+    InstructorDashboardService>();
+
 builder.Services.AddControllers();
 
 builder.Services
