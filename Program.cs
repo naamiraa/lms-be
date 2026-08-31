@@ -18,6 +18,7 @@ using be.Services.Admin;
 using be.Services.Evaluation;
 using be.Settings;
 using be.Services.Certificate;
+using be.Services.Dashboard;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -104,6 +105,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ICertificatePdfService,
     CertificatePdfService>();
+
+builder.Services.AddScoped<
+    IParticipantDashboardService,
+    ParticipantDashboardService>();
 
 builder.Services.AddControllers();
 
