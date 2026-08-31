@@ -12,6 +12,8 @@ using be.Services.SimulationDomain;
 using be.Services.SimulationScenario;
 using be.Services.SimulationSession;
 using be.Services.PerformanceEvaluation;
+using be.Services.InstructorFeedback;
+using be.Services.Admin;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -71,6 +73,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IPerformanceEvaluationService,
     PerformanceEvaluationService>();
+
+builder.Services.AddScoped<
+    IInstructorFeedbackService,
+    InstructorFeedbackService>();
+
+builder.Services.AddScoped<
+    IAdminService, 
+    AdminService>();
 
 builder.Services.AddControllers();
 

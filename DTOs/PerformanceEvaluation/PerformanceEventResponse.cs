@@ -2,6 +2,8 @@ namespace be.DTOs.PerformanceEvaluation;
 
 public class PerformanceEventResponse
 {
+    public Guid EventId { get; set; }
+
     public string EventType { get; set; } = string.Empty;
 
     public string? Severity { get; set; }

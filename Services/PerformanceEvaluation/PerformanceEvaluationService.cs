@@ -115,6 +115,7 @@ public class PerformanceEvaluationService
                 .Select(e =>
                     new PerformanceEventResponse
                     {
+                        EventId = e.Id,
                         EventType = e.EventType,
                         Severity = e.Severity,
                         Description = e.Description,
