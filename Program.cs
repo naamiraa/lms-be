@@ -21,6 +21,7 @@ using be.Services.Evaluation;
 using be.Settings;
 using be.Services.Certificate;
 using be.Services.Dashboard;
+using be.Services.InstructorSession;
 using be.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -119,6 +120,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IAdminDashboardService,
     AdminDashboardService>();
+
+builder.Services.AddScoped<
+    IInstructorSessionService,
+    InstructorSessionService>();
 
 builder.Services.AddControllers();
 

@@ -23,6 +23,33 @@ public class AdminUsersController : ControllerBase
         _adminService = adminService;
     }
 
+    // GET: /api/admin/users
+    [HttpGet]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .OrderByDescending(u => u.CreatedAt)
+            .Select(u => new
+            {
+                u.Id,
+                u.Name,
+                u.Email,
+                u.EmployeeNumber,
+                u.RegistrationSource,
+                u.ApprovalStatus,
+                u.IsActive,
+                Roles = u.UserRoles
+                    .Select(ur => ur.Role.Name)
+                    .ToList(),
+                u.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+
     // GET: /api/admin/users/pending
     [HttpGet("pending")]
     public async Task<IActionResult> GetPendingUsers()
