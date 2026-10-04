@@ -10,5 +10,7 @@ public class ParticipantQuestionResponse
 
     public int Order { get; set; }
 
+    public Guid? SelectedOptionId { get; set; }
+
     public List<ParticipantOptionResponse> Options { get; set; } = new();
 }

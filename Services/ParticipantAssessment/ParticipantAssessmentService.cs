@@ -49,6 +49,7 @@ public class ParticipantAssessmentService
          * tetapi belum submit, jangan membuat attempt baru.
          */
         var existingAttempt = await _context.AssessmentAttempts
+            .Include(a => a.Answers)
             .FirstOrDefaultAsync(a =>
                 a.AssessmentId == assessmentId &&
                 a.UserId == userId &&
@@ -56,9 +57,20 @@ public class ParticipantAssessmentService
 
         if (existingAttempt != null)
         {
-            return BuildResponse(
-                assessment,
-                existingAttempt);
+            var expiresAt = existingAttempt.StartedAt
+                .AddMinutes(assessment.DurationMinutes);
+
+            if (DateTime.UtcNow <= expiresAt)
+            {
+                return BuildResponse(
+                    assessment,
+                    existingAttempt);
+            }
+
+            existingAttempt.Status = "EXPIRED";
+            existingAttempt.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
         }
 
         var previousAttempts = await _context.AssessmentAttempts
@@ -87,6 +99,48 @@ public class ParticipantAssessmentService
 
         return BuildResponse(
             assessment,
+            attempt);
+    }
+
+
+    public async Task<StartAssessmentResponse> GetAttemptAsync(
+        Guid userId,
+        Guid attemptId)
+    {
+        var attempt = await _context.AssessmentAttempts
+            .Include(a => a.Assessment)
+                .ThenInclude(a => a.LearningModule)
+            .Include(a => a.Assessment)
+                .ThenInclude(a => a.Questions.Where(q => q.IsActive))
+                    .ThenInclude(q => q.Options.Where(o => o.IsActive))
+            .Include(a => a.Answers)
+            .FirstOrDefaultAsync(a =>
+                a.Id == attemptId &&
+                a.UserId == userId);
+
+        if (attempt == null)
+        {
+            throw new ArgumentException(
+                "Assessment attempt not found.");
+        }
+
+        if (attempt.Status == "IN_PROGRESS")
+        {
+            var expiresAt = attempt.StartedAt
+                .AddMinutes(
+                    attempt.Assessment.DurationMinutes);
+
+            if (DateTime.UtcNow > expiresAt)
+            {
+                attempt.Status = "EXPIRED";
+                attempt.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        return BuildResponse(
+            attempt.Assessment,
             attempt);
     }
 
@@ -292,6 +346,13 @@ public class ParticipantAssessmentService
                     QuestionText = q.QuestionText,
                     MediaUrl = q.MediaUrl,
                     Order = q.Order,
+
+                    SelectedOptionId = attempt.Answers
+                        .Where(a =>
+                            a.AssessmentQuestionId == q.Id)
+                        .Select(a =>
+                            (Guid?)a.SelectedOptionId)
+                        .FirstOrDefault(),
 
                     Options = q.Options
                         .OrderBy(o => o.Order)

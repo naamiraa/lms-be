@@ -8,6 +8,10 @@ public interface IParticipantAssessmentService
         Guid userId,
         Guid assessmentId);
 
+    Task<StartAssessmentResponse> GetAttemptAsync(
+        Guid userId,
+        Guid attemptId);
+
     Task<SaveAssessmentAnswerResponse> SaveAnswerAsync(
         Guid userId,
         Guid attemptId,

@@ -62,6 +62,48 @@ public class ParticipantAssessmentsController : ControllerBase
     }
 
 
+    [HttpGet("attempts/{attemptId:guid}")]
+    public async Task<IActionResult> GetAttempt(
+        Guid attemptId)
+    {
+        try
+        {
+            var userIdClaim =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new
+                {
+                    message = "Invalid user identity."
+                });
+            }
+
+            var result =
+                await _participantAssessmentService
+                    .GetAttemptAsync(
+                        userId,
+                        attemptId);
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new
+            {
+                message = ex.Message
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+
     [HttpPut("attempts/{attemptId:guid}/questions/{questionId:guid}/answer")]
     public async Task<IActionResult> SaveAnswer(
         Guid attemptId,
