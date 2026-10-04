@@ -7,7 +7,7 @@ namespace be.Controllers;
 
 [ApiController]
 [Route("api/performance-evaluations")]
-[Authorize(Roles = "PARTICIPANT")]
+[Authorize(Roles = "PARTICIPANT,INSTRUCTOR")]
 public class PerformanceEvaluationController
     : ControllerBase
 {
@@ -36,10 +36,14 @@ public class PerformanceEvaluationController
                 return Unauthorized();
             }
 
+            var isInstructor =
+                User.IsInRole("INSTRUCTOR");
+
             var result =
                 await _service.GetBySessionIdAsync(
                     userId,
-                    sessionId);
+                    sessionId,
+                    isInstructor);
 
             if (result == null)
             {

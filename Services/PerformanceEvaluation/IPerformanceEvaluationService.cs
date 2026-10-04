@@ -6,5 +6,6 @@ public interface IPerformanceEvaluationService
 {
     Task<PerformanceEvaluationResponse?> GetBySessionIdAsync(
         Guid userId,
-        Guid sessionId);
+        Guid sessionId,
+        bool isInstructor = false);
 }

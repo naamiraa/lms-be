@@ -22,15 +22,21 @@ public class PerformanceEvaluationService
     public async Task<PerformanceEvaluationResponse?>
         GetBySessionIdAsync(
             Guid userId,
-            Guid sessionId)
+            Guid sessionId,
+            bool isInstructor = false)
     {
-        var session = await _context.SimulationSessions
+        var query = _context.SimulationSessions
             .Include(s => s.AssessmentAttempt)
             .Include(s => s.Result)
             .Include(s => s.Events)
             .Include(s => s.SimulationScenario)
                 .ThenInclude(s => s.SimulationDomain)
-            .FirstOrDefaultAsync(s =>
+            .AsQueryable();
+
+        var session = isInstructor
+            ? await query.FirstOrDefaultAsync(s =>
+                s.Id == sessionId)
+            : await query.FirstOrDefaultAsync(s =>
                 s.Id == sessionId &&
                 s.UserId == userId);
 
