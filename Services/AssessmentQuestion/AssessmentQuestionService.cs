@@ -157,22 +157,41 @@ public class AssessmentQuestionService : IAssessmentQuestionService
         question.Order = request.Order;
         question.UpdatedAt = DateTime.UtcNow;
 
-        // Nonaktifkan options lama.
-        foreach (var option in question.Options)
+        var existingOptions = question.Options
+            .Where(o => o.IsActive)
+            .OrderBy(o => o.Order)
+            .ToList();
+
+        for (var i = 0; i < request.Options.Count; i++)
         {
-            option.IsActive = false;
-            option.UpdatedAt = DateTime.UtcNow;
+            var optionRequest = request.Options[i];
+
+            if (i < existingOptions.Count)
+            {
+                var option = existingOptions[i];
+
+                option.OptionText = optionRequest.OptionText;
+                option.IsCorrect = optionRequest.IsCorrect;
+                option.Order = optionRequest.Order;
+                option.UpdatedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                question.Options.Add(new Models.QuestionOption
+                {
+                    OptionText = optionRequest.OptionText,
+                    IsCorrect = optionRequest.IsCorrect,
+                    Order = optionRequest.Order
+                });
+            }
         }
 
-        // Buat options versi terbaru.
-        foreach (var optionRequest in request.Options)
+        // Kalau jumlah option baru lebih sedikit,
+        // nonaktifkan option lama yg tdk lg digunakan
+        for (var i = request.Options.Count; i < existingOptions.Count; i++)
         {
-            question.Options.Add(new Models.QuestionOption
-            {
-                OptionText = optionRequest.OptionText,
-                IsCorrect = optionRequest.IsCorrect,
-                Order = optionRequest.Order
-            });
+            existingOptions[i].IsActive = false;
+            existingOptions[i].UpdatedAt = DateTime.UtcNow;
         }
 
         await _context.SaveChangesAsync();
