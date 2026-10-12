@@ -176,7 +176,7 @@ public class InstructorFeedbackService : IInstructorFeedbackService
             return null;
         }
 
-        // Participant may only see their own feedback.
+        // Participant may only see their own feedback
         if (!isInstructor && session.UserId != userId)
         {
             return null;

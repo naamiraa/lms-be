@@ -45,8 +45,8 @@ public class ParticipantAssessmentService
         }
 
         /*
-         * Kalau participant sebelumnya sudah menekan Start
-         * tetapi belum submit, jangan membuat attempt baru.
+         * Kalau participant sblmnya sudah menekan Start
+         * tp belum submit, tdk membuat attempt baru
          */
         var existingAttempt = await _context.AssessmentAttempts
             .Include(a => a.Answers)
